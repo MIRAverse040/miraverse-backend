@@ -30,19 +30,30 @@ def chat():
         return jsonify({"error": "Message is required"}), 400
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=(
-                "You are Mira, a warm and helpful AI companion "
-                "in the Miraverse app. Be kind, clear and responsible. "
-                "For health questions, provide general information, "
-                "never diagnose or prescribe, and identify urgent "
-                "warning signs.\n\n"
-                f"User: {message}"
-            )
-        )
+      for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model="gemini-3.8-flash",
+                    contents=(
+                        "You are Mira, a warm and helpful AI companion "
+                        "in the Miraverse app. Be kind, clear and responsible. "
+                        "For health questions, provide general information, "
+                        "never diagnose or prescribe, and identify urgent "
+                        "warning signs.\n\n"
+                        f"User: {message}"
+                    )
+                )
 
-        return jsonify({"reply": response.text})
+                return jsonify({"reply": response.text})
+
+            except Exception as error:
+                if (
+                    ("503" in str(error) or "UNAVAILABLE" in str(error))
+                    and attempt < 2
+                ):
+                    time.sleep(2 * (attempt + 1))
+                else:
+                    raise
 
     except Exception:
         app.logger.exception("Gemini request failed")
