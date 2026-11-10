@@ -33,7 +33,7 @@ def chat():
       for attempt in range(3):
             try:
                 response = client.models.generate_content(
-                    model="gemini-3.8-flash",
+                    model="gemini-2.5-flash",
                     contents=(
                         "You are Mira, a warm and helpful AI companion "
                         "in the Miraverse app. Be kind, clear and responsible. "
